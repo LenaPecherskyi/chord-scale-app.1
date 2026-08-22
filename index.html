@@ -1365,6 +1365,25 @@
     padding:11px 18px; border-radius:12px; border:1px solid var(--border); cursor:pointer;
     background:transparent; color:var(--muted); font-weight:700; font-size:0.88rem;
   }
+  .pro-purchase-block{
+    margin:4px 0 18px; padding-top:14px; border-top:1px solid var(--border);
+  }
+  .pro-purchase-price{ font-size:0.85rem !important; color:var(--text) !important; font-weight:700; margin-bottom:12px !important; }
+  .pro-purchase-methods{ display:flex; flex-direction:column; gap:10px; }
+  .pro-purchase-method{ min-height:2px; }
+  .pro-pay-btn{ width:100%; box-sizing:border-box; }
+  #wayforpayBtn{
+    background:linear-gradient(120deg,#3ec6ff,#4a8dff); color:#03142b;
+  }
+  .pro-purchase-status{
+    margin:12px 0 0 !important; font-size:0.82rem !important; min-height:1.1em;
+  }
+  .pro-purchase-status.is-error{ color:#ff6b6b !important; }
+  .pro-purchase-status.is-success{ color:#5fd98a !important; }
+  .pro-active-note{
+    margin:0 0 16px; padding:10px 12px; border-radius:10px; font-size:0.85rem;
+    background:rgba(95,217,138,0.12); border:1px solid rgba(95,217,138,0.35); color:#5fd98a;
+  }
 
   /* --- Печать / экспорт в PDF: показываем только активную вкладку, без фонов, свечения и кнопок --- */
   @media print{
@@ -1411,8 +1430,20 @@
   <div class="pro-modal">
     <h3>🔒 <span id="proModalTitle" data-i18n="proModal.defaultTitle">Функция доступна в полной версии</span></h3>
     <p id="proModalText" data-i18n="proModal.defaultText">Эта функция входит в платную версию приложения.</p>
+
+    <div id="proPurchaseBlock" class="pro-purchase-block">
+      <p class="pro-purchase-price" data-i18n="proModal.priceLine">Подписка PRO: $9.99 / год (или 400₴ / год) — с автопродлением, отменить можно в любой момент.</p>
+      <div class="pro-purchase-methods">
+        <div class="pro-purchase-method">
+          <div id="paypalButtonContainer"></div>
+          <button class="pro-modal-cta pro-pay-btn" id="paypalFallbackBtn" style="display:none;" data-i18n="proModal.paypalUnavailable">PayPal сейчас недоступен</button>
+        </div>
+        <button class="pro-modal-cta pro-pay-btn" id="wayforpayBtn" data-i18n="proModal.payWayforpay">Оформить через WayForPay — 400₴/год</button>
+      </div>
+      <p class="pro-purchase-status" id="proPurchaseStatus" role="status" aria-live="polite"></p>
+    </div>
+
     <div class="pro-modal-actions">
-      <button class="pro-modal-cta" id="proModalCta" data-i18n="proModal.cta">Узнать о полной версии</button>
       <button class="pro-modal-close" id="proModalClose" data-i18n="proModal.close">Закрыть</button>
     </div>
   </div>
@@ -2351,7 +2382,9 @@
     customChord: null, // результат parseChordSymbol(), когда активен поиск
     selectedVoicing: null, // id выбранного войсинга для диаграмм (клавиатура/гитара)
     circleFifths: { idx: 0, mode: 'major', rotation: 0 }, // выбранная тональность и угол поворота колеса на вкладке «Квинтовый круг»
-    isPro: false, // визуальный флаг «полная версия» — переключается только демо-чекбоксом в шапке, реальной оплаты нет
+    isPro: false, // итоговый флаг «полная версия» = isProDemo || isProReal (см. recomputeIsPro)
+    isProDemo: false, // включается демо-чекбоксом в шапке (для тестирования интерфейса)
+    isProReal: false, // включается настоящей активной подпиской (PayPal/WayForPay), см. PRO_LICENSE
     lang: detectInitialLang() // 'ru' | 'uk' | 'en' — язык интерфейса
   };
 
@@ -2486,6 +2519,16 @@
     "proModal.defaultText": "Эта функция входит в платную версию приложения.",
     "proModal.cta": "Узнать о полной версии",
     "proModal.close": "Закрыть",
+    "proModal.priceLine": "Подписка PRO: $9.99/год через PayPal или 400₴/год через WayForPay — с автопродлением, отменить можно в любой момент.",
+    "proModal.paypalUnavailable": "PayPal сейчас недоступен",
+    "proModal.payWayforpay": "Оформить через WayForPay — 400₴/год",
+    "proModal.statusRedirecting": "Открываем окно оплаты…",
+    "proModal.statusVerifying": "Проверяем платёж…",
+    "proModal.statusSuccessPaypal": "Подписка оформлена! PRO активирован.",
+    "proModal.statusSuccessWfp": "Оплата прошла! PRO активирован.",
+    "proModal.statusError": "Не удалось оформить подписку. Попробуйте ещё раз или напишите нам.",
+    "proModal.statusDeclined": "Платёж не прошёл. Попробуйте другой способ оплаты.",
+    "proModal.activeNote": "PRO уже активен по подписке ({provider}). Продление: {date}.",
     "tab.chord": "Аккорд",
     "tab.scale": "Лад / Гамма",
     "tab.metronome": "Метроном",
@@ -2678,6 +2721,16 @@
     "proModal.defaultText": "This feature is part of the paid version of the app.",
     "proModal.cta": "Learn about the full version",
     "proModal.close": "Close",
+    "proModal.priceLine": "PRO subscription: $9.99/year via PayPal or 400₴/year via WayForPay — auto-renews, cancel anytime.",
+    "proModal.paypalUnavailable": "PayPal is unavailable right now",
+    "proModal.payWayforpay": "Subscribe via WayForPay — 400₴/year",
+    "proModal.statusRedirecting": "Opening payment window…",
+    "proModal.statusVerifying": "Verifying payment…",
+    "proModal.statusSuccessPaypal": "Subscribed! PRO is now active.",
+    "proModal.statusSuccessWfp": "Payment received! PRO is now active.",
+    "proModal.statusError": "Couldn't complete the subscription. Please try again or contact us.",
+    "proModal.statusDeclined": "Payment declined. Please try another payment method.",
+    "proModal.activeNote": "PRO is active via subscription ({provider}). Renews: {date}.",
     "tab.chord": "Chord",
     "tab.scale": "Scale / Mode",
     "tab.metronome": "Metronome",
@@ -2870,6 +2923,16 @@
     "proModal.defaultText": "Ця функція входить у платну версію застосунку.",
     "proModal.cta": "Дізнатися про повну версію",
     "proModal.close": "Закрити",
+    "proModal.priceLine": "Підписка PRO: $9.99/рік через PayPal або 400₴/рік через WayForPay — з автопродовженням, скасувати можна будь-коли.",
+    "proModal.paypalUnavailable": "PayPal зараз недоступний",
+    "proModal.payWayforpay": "Оформити через WayForPay — 400₴/рік",
+    "proModal.statusRedirecting": "Відкриваємо вікно оплати…",
+    "proModal.statusVerifying": "Перевіряємо платіж…",
+    "proModal.statusSuccessPaypal": "Підписку оформлено! PRO активовано.",
+    "proModal.statusSuccessWfp": "Оплату отримано! PRO активовано.",
+    "proModal.statusError": "Не вдалося оформити підписку. Спробуйте ще раз або напишіть нам.",
+    "proModal.statusDeclined": "Платіж не пройшов. Спробуйте інший спосіб оплати.",
+    "proModal.activeNote": "PRO активний за підпискою ({provider}). Продовження: {date}.",
     "tab.chord": "Акорд",
     "tab.scale": "Лад / Гама",
     "tab.metronome": "Метроном",
@@ -5041,8 +5104,237 @@
     document.getElementById('proModalTitle').textContent = title;
     document.getElementById('proModalText').textContent = text;
     document.getElementById('proModalOverlay').style.display = '';
+    renderProPurchaseBlock(); // рендерим/обновляем блок оплаты только сейчас, когда модалка видна
   }
   function hideProModal(){ document.getElementById('proModalOverlay').style.display = 'none'; }
+
+  /* ---------- PRO-ПОДПИСКА (PayPal / WayForPay) ----------
+     Приложение статическое (без базы данных и учётных записей), поэтому «источник истины»
+     о наличии активной подписки — это внешний сервис оплаты (PayPal/WayForPay), а в этом
+     браузере хранится только лёгкая запись-кэш в localStorage:
+       { provider: 'paypal'|'wayforpay', subscriptionId | orderReference, paidUntil (ISO), lastVerifiedAt (ISO) }
+     При каждом запуске приложения запись перепроверяется у провайдера (см. refreshProLicenseOnLoad),
+     чтобы отмена/истечение подписки корректно отражались и в этом браузере. Это не создаёт
+     аккаунт пользователя и не привязывает подписку к email — только к конкретному браузеру/устройству,
+     на котором прошла оплата. */
+  const PRO_LICENSE_KEY = 'chordsModesProLicense_v1';
+
+  function loadProLicense(){
+    try {
+      const raw = localStorage.getItem(PRO_LICENSE_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch(e){ return null; }
+  }
+  function saveProLicense(lic){
+    try { localStorage.setItem(PRO_LICENSE_KEY, JSON.stringify(lic)); } catch(e){}
+  }
+  function clearProLicense(){
+    try { localStorage.removeItem(PRO_LICENSE_KEY); } catch(e){}
+  }
+
+  function recomputeIsPro(){
+    state.isPro = !!(state.isProDemo || state.isProReal);
+    const badge = document.getElementById('downloadPdfBtn') && document.getElementById('downloadPdfBtn').querySelector('.pro-badge');
+    if(badge) badge.style.display = state.isPro ? 'none' : '';
+    buildProgStyleUI();
+    buildProgLengthUI();
+    // Блок покупки (и особенно кнопки PayPal) пересобираем только когда PRO-модалка реально
+    // видна — PayPal SDK неправильно считает размеры кнопок, если рендерить их в display:none.
+    const overlay = document.getElementById('proModalOverlay');
+    if(overlay && overlay.style.display !== 'none') renderProPurchaseBlock();
+  }
+
+  function setProPurchaseStatus(text, kind){
+    const el = document.getElementById('proPurchaseStatus');
+    if(!el) return;
+    el.textContent = text || '';
+    el.classList.remove('is-error', 'is-success');
+    if(kind) el.classList.add(kind === 'error' ? 'is-error' : 'is-success');
+  }
+
+  // Показывает либо блок с кнопками оплаты, либо заметку «PRO уже активен», в зависимости
+  // от реального (не демо) статуса подписки — демо-режим используется только для проверки
+  // интерфейса и не должен прятать блок покупки от реального покупателя.
+  function renderProPurchaseBlock(){
+    const block = document.getElementById('proPurchaseBlock');
+    if(!block) return;
+    const lic = loadProLicense();
+    if(state.isProReal && lic){
+      const providerLabel = lic.provider === 'paypal' ? 'PayPal' : 'WayForPay';
+      const dateStr = lic.paidUntil ? new Date(lic.paidUntil).toLocaleDateString(state.lang === 'ru' ? 'ru-RU' : state.lang === 'uk' ? 'uk-UA' : 'en-US') : '—';
+      block.innerHTML = '<p class="pro-active-note">' + t('proModal.activeNote', {provider: providerLabel, date: dateStr}) + '</p>';
+    } else {
+      // Пересобираем исходную разметку блока покупки (на случай если до этого показывали activeNote).
+      block.innerHTML =
+        '<p class="pro-purchase-price" data-i18n="proModal.priceLine">' + t('proModal.priceLine') + '</p>' +
+        '<div class="pro-purchase-methods">' +
+          '<div class="pro-purchase-method"><div id="paypalButtonContainer"></div></div>' +
+          '<button class="pro-modal-cta pro-pay-btn" id="wayforpayBtn" data-i18n="proModal.payWayforpay">' + t('proModal.payWayforpay') + '</button>' +
+        '</div>' +
+        '<p class="pro-purchase-status" id="proPurchaseStatus" role="status" aria-live="polite"></p>';
+      wireWayforpayButton();
+      initPaypalButtons();
+    }
+  }
+
+  let paypalSdkPromise = null;
+  function loadPaypalSdk(clientId){
+    if(paypalSdkPromise) return paypalSdkPromise;
+    paypalSdkPromise = fetch('/.netlify/functions/paypal-config')
+      .then(r => r.json())
+      .then(cfg => new Promise((resolve, reject) => {
+        if(!cfg.clientId || !cfg.planId){ reject(new Error('no-config')); return; }
+        const script = document.createElement('script');
+        script.src = 'https://www.paypal.com/sdk/js?client-id=' + encodeURIComponent(cfg.clientId) + '&vault=true&intent=subscription';
+        script.onload = () => resolve(cfg);
+        script.onerror = () => reject(new Error('sdk-load-failed'));
+        document.head.appendChild(script);
+      }));
+    return paypalSdkPromise;
+  }
+
+  function initPaypalButtons(){
+    const container = document.getElementById('paypalButtonContainer');
+    if(!container) return;
+    loadPaypalSdk().then(cfg => {
+      if(!window.paypal || !cfg.planId){ throw new Error('no-plan'); }
+      window.paypal.Buttons({
+        style: { layout: 'horizontal', color: 'gold', shape: 'pill', label: 'subscribe', height: 45 },
+        createSubscription: (data, actions) => actions.subscription.create({ plan_id: cfg.planId }),
+        onApprove: (data) => {
+          setProPurchaseStatus(t('proModal.statusVerifying'));
+          return fetch('/.netlify/functions/paypal-verify-subscription', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ subscriptionId: data.subscriptionID })
+          })
+            .then(r => r.json())
+            .then(res => {
+              if(res.active){
+                saveProLicense({
+                  provider: 'paypal',
+                  subscriptionId: data.subscriptionID,
+                  paidUntil: res.nextBillingTime || null,
+                  lastVerifiedAt: new Date().toISOString()
+                });
+                state.isProReal = true;
+                setProPurchaseStatus(t('proModal.statusSuccessPaypal'), 'success');
+                recomputeIsPro();
+              } else {
+                setProPurchaseStatus(t('proModal.statusError'), 'error');
+              }
+            })
+            .catch(() => setProPurchaseStatus(t('proModal.statusError'), 'error'));
+        },
+        onError: () => setProPurchaseStatus(t('proModal.statusError'), 'error')
+      }).render('#paypalButtonContainer');
+    }).catch(() => {
+      const fallback = document.getElementById('paypalFallbackBtn');
+      if(fallback) fallback.style.display = '';
+    });
+  }
+
+  let wayforpayWidgetPromise = null;
+  function loadWayforpayWidget(){
+    if(wayforpayWidgetPromise) return wayforpayWidgetPromise;
+    wayforpayWidgetPromise = new Promise((resolve, reject) => {
+      if(window.Wayforpay){ resolve(); return; }
+      const script = document.createElement('script');
+      script.src = 'https://secure.wayforpay.com/server/pay-widget.js';
+      script.onload = resolve;
+      script.onerror = () => reject(new Error('widget-load-failed'));
+      document.head.appendChild(script);
+    });
+    return wayforpayWidgetPromise;
+  }
+
+  function wireWayforpayButton(){
+    const btn = document.getElementById('wayforpayBtn');
+    if(!btn) return;
+    btn.addEventListener('click', () => {
+      setProPurchaseStatus(t('proModal.statusRedirecting'));
+      Promise.all([
+        loadWayforpayWidget(),
+        fetch('/.netlify/functions/wayforpay-sign', { method: 'POST' }).then(r => r.json())
+      ]).then(([, payload]) => {
+        if(payload.error){ throw new Error(payload.error); }
+        const wfp = new window.Wayforpay();
+        const orderReference = payload.orderReference;
+        wfp.run(payload,
+          () => { // approvedCallback
+            setProPurchaseStatus(t('proModal.statusVerifying'));
+            fetch('/.netlify/functions/wayforpay-check-status', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ orderReference })
+            })
+              .then(r => r.json())
+              .then(res => {
+                if(res.approved){
+                  const paidUntil = new Date();
+                  paidUntil.setFullYear(paidUntil.getFullYear() + 1);
+                  saveProLicense({
+                    provider: 'wayforpay',
+                    orderReference,
+                    paidUntil: paidUntil.toISOString(),
+                    lastVerifiedAt: new Date().toISOString()
+                  });
+                  state.isProReal = true;
+                  setProPurchaseStatus(t('proModal.statusSuccessWfp'), 'success');
+                  recomputeIsPro();
+                } else {
+                  setProPurchaseStatus(t('proModal.statusError'), 'error');
+                }
+              })
+              .catch(() => setProPurchaseStatus(t('proModal.statusError'), 'error'));
+          },
+          () => setProPurchaseStatus(t('proModal.statusDeclined'), 'error'), // declinedCallback
+          () => setProPurchaseStatus(t('proModal.statusVerifying')) // pendingCallback
+        );
+      }).catch(() => setProPurchaseStatus(t('proModal.statusError'), 'error'));
+    });
+  }
+
+  // Перепроверяет сохранённую подписку у провайдера при каждом запуске приложения (не чаще
+  // раза в 12 часов, чтобы не дёргать функции лишний раз) — так отмена или истечение подписки
+  // корректно погасит PRO и в этом браузере, а не будет светиться вечно по старой записи.
+  function refreshProLicenseOnLoad(){
+    const lic = loadProLicense();
+    if(!lic){ recomputeIsPro(); return; }
+
+    const lastVerified = lic.lastVerifiedAt ? new Date(lic.lastVerifiedAt).getTime() : 0;
+    const stale = (Date.now() - lastVerified) > 12 * 60 * 60 * 1000;
+
+    if(lic.provider === 'paypal'){
+      state.isProReal = true; // оптимистично считаем активной, пока не доказано обратное
+      recomputeIsPro();
+      if(stale && lic.subscriptionId){
+        fetch('/.netlify/functions/paypal-verify-subscription', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ subscriptionId: lic.subscriptionId })
+        }).then(r => r.json()).then(res => {
+          state.isProReal = !!res.active;
+          if(res.active){
+            saveProLicense(Object.assign({}, lic, { paidUntil: res.nextBillingTime || lic.paidUntil, lastVerifiedAt: new Date().toISOString() }));
+          } else {
+            clearProLicense();
+          }
+          recomputeIsPro();
+        }).catch(() => {}); // сеть недоступна — оставляем как есть до следующей загрузки
+      }
+    } else if(lic.provider === 'wayforpay'){
+      // Без подтверждения от провайдера просто доверяем локально сохранённой дате окончания
+      // годовой подписки — WayForPay шлёт уведомления об автопродлении на серверный вебхук
+      // (wayforpay-callback), а не в браузер конкретного покупателя, поэтому у клиентской
+      // проверки здесь заведомо ограниченная точность вблизи даты продления.
+      const paidUntilMs = lic.paidUntil ? new Date(lic.paidUntil).getTime() : 0;
+      state.isProReal = paidUntilMs > Date.now();
+      if(!state.isProReal) clearProLicense();
+      recomputeIsPro();
+    } else {
+      recomputeIsPro();
+    }
+  }
 
   // Экспорт в PDF — без внешних библиотек: помечаем карточку(и) текущей вкладки классом
   // .print-target (см. @media print в <style>) и вызываем нативный диалог печати браузера,
@@ -5683,17 +5975,14 @@
       printCurrentView();
     });
     document.getElementById('proDemoToggle').addEventListener('change', (e)=>{
-      state.isPro = e.target.checked;
-      const badge = document.getElementById('downloadPdfBtn').querySelector('.pro-badge');
-      if(badge) badge.style.display = state.isPro ? 'none' : '';
-      buildProgStyleUI();
-      buildProgLengthUI();
+      state.isProDemo = e.target.checked;
+      recomputeIsPro();
     });
     document.getElementById('proModalClose').addEventListener('click', hideProModal);
-    document.getElementById('proModalCta').addEventListener('click', hideProModal);
     document.getElementById('proModalOverlay').addEventListener('click', (e)=>{
       if(e.target.id === 'proModalOverlay') hideProModal();
     });
+    refreshProLicenseOnLoad();
     window.addEventListener('afterprint', ()=>{
       document.querySelectorAll('.print-target').forEach(el=> el.classList.remove('print-target'));
     });
