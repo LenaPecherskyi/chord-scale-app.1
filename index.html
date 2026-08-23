@@ -5327,10 +5327,20 @@
      .container, в самом верху body). Список баннеров — в banners.json в корне сайта,
      который редактируется через отдельную страницу admin-banners.html (без правок кода).
      Если баннеров несколько — листаются по очереди, у каждого своя длительность показа.
-     Если файла нет / он пуст / запрос не удался — полоса остаётся скрытой, ничего не ломается. */
+     Если файла нет / он пуст / запрос не удался — полоса остаётся скрытой, ничего не ломается.
+     У каждого баннера есть необязательное поле lang ('ru' / 'uk' / 'en') — на русской версии
+     показываются только баннеры без lang или с lang:'ru', на украинской — только без lang или
+     с lang:'uk', и т.д. (та же логика, что и у уроков в eduMatchesCurrentLang). promoBannerRaw
+     хранит полный список с сервера, promoBannerList — уже отфильтрованный под текущий язык;
+     при переключении языка интерфейса список перефильтровывается без повторного запроса. */
+  let promoBannerRaw = [];
   let promoBannerList = [];
   let promoBannerIndex = 0;
   let promoBannerTimer = null;
+
+  function promoBannerMatchesLang(b){
+    return !b.lang || b.lang === state.lang;
+  }
 
   async function initPromoBanner(){
     const strip = document.getElementById('promoBannerStrip');
@@ -5341,12 +5351,23 @@
       if(!res.ok) return;
       data = await res.json();
     } catch(e){ return; }
-    const list = Array.isArray(data && data.banners)
+    promoBannerRaw = Array.isArray(data && data.banners)
       ? data.banners.filter(b => b && b.enabled !== false && b.image && b.link)
       : [];
-    if(!list.length) return;
+    applyPromoBannerLangFilter();
+  }
+
+  function applyPromoBannerLangFilter(){
+    const strip = document.getElementById('promoBannerStrip');
+    if(!strip) return;
+    clearTimeout(promoBannerTimer);
+    const list = promoBannerRaw.filter(promoBannerMatchesLang);
     promoBannerList = list;
     promoBannerIndex = 0;
+    if(!list.length){
+      strip.style.display = 'none';
+      return;
+    }
     showPromoBannerAt(0);
     strip.style.display = '';
     if(list.length > 1) schedulePromoBannerRotation();
@@ -6297,6 +6318,7 @@
         buildProgLengthUI();
         buildProgStyleUI();
         if(progState.lastResult){ renderProgressionResult(progState.lastResult, progState.lastSeed); }
+        applyPromoBannerLangFilter();
         render();
       });
     });

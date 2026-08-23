@@ -31,6 +31,10 @@
     background:rgba(255,255,255,0.03); color:var(--text); font-size:0.92rem;
   }
   input[type=file]{ color:var(--text); font-size:0.85rem; }
+  select{
+    width:100%; padding:9px 11px; border-radius:9px; border:1px solid var(--border);
+    background:rgba(255,255,255,0.03); color:var(--text); font-size:0.92rem;
+  }
   .row{ display:flex; gap:10px; flex-wrap:wrap; }
   .row > *{ flex:1 1 140px; }
   button{
@@ -72,7 +76,9 @@
     Здесь можно загрузить кликабельные баннеры (картинка + ссылка) для своих курсов и вебинаров —
     они появятся одной полосой вверху сайта <a class="site-link" href="/" target="_blank">app.andrewpechersky.online</a>,
     видны на всех вкладках. Если баннеров несколько, они листаются по очереди — время показа каждого
-    настраивается отдельно. Изменения публикуются на сайте примерно за 15–30 секунд после сохранения.
+    настраивается отдельно. У каждого баннера можно задать язык — тогда он покажется только тем,
+    у кого сайт на этом языке интерфейса (например, баннер с языком «Только RU» не увидят посетители
+    украинской или английской версии). Изменения публикуются на сайте примерно за 15–30 секунд после сохранения.
   </p>
 
   <div id="gateCard" class="card gate">
@@ -100,6 +106,14 @@
       </div>
       <label>Ссылка (куда вести при клике)</label>
       <input type="url" id="newLinkInput" placeholder="https://...">
+      <label>Язык баннера</label>
+      <select id="newLangInput">
+        <option value="">Все языки (показывать всем)</option>
+        <option value="ru">Только русская версия сайта</option>
+        <option value="uk">Тільки українська версія сайту</option>
+        <option value="en">English version only</option>
+      </select>
+      <div class="hint">Баннер покажется только тем, у кого сайт переключён на выбранный язык интерфейса. «Все языки» — показывать всем, независимо от языка.</div>
       <label>Показывать N секунд (при нескольких баннерах)</label>
       <input type="number" id="newDurationInput" value="12" min="3" max="120">
       <div style="margin-top:14px;">
@@ -133,7 +147,8 @@
           image: b.image,
           link: b.link,
           duration: Number(b.duration) || 12,
-          enabled: b.enabled !== false
+          enabled: b.enabled !== false,
+          lang: (b.lang === 'ru' || b.lang === 'uk' || b.lang === 'en') ? b.lang : ''
         })) : [];
       }
     } catch(e){ /* пусто по умолчанию */ }
@@ -156,6 +171,15 @@
           <input type="url" data-field="link" value="${(b.link||'').replace(/"/g,'&quot;')}">
           <div class="row">
             <div>
+              <label>Язык</label>
+              <select data-field="lang">
+                <option value="" ${!b.lang ? 'selected' : ''}>Все языки</option>
+                <option value="ru" ${b.lang === 'ru' ? 'selected' : ''}>Только RU</option>
+                <option value="uk" ${b.lang === 'uk' ? 'selected' : ''}>Тільки UK</option>
+                <option value="en" ${b.lang === 'en' ? 'selected' : ''}>English only</option>
+              </select>
+            </div>
+            <div>
               <label>Секунд показа</label>
               <input type="number" data-field="duration" value="${b.duration}" min="3" max="120">
             </div>
@@ -171,6 +195,7 @@
         </div>
       `;
       item.querySelector('[data-field="link"]').addEventListener('input', e => { banners[idx].link = e.target.value; });
+      item.querySelector('[data-field="lang"]').addEventListener('change', e => { banners[idx].lang = e.target.value; });
       item.querySelector('[data-field="duration"]').addEventListener('input', e => { banners[idx].duration = Number(e.target.value) || 12; });
       item.querySelector('[data-field="enabled"]').addEventListener('change', e => { banners[idx].enabled = e.target.checked; });
       item.querySelector('[data-action="up"]').addEventListener('click', () => { moveBanner(idx, -1); });
@@ -253,13 +278,15 @@
     errBox.textContent = '';
     const link = document.getElementById('newLinkInput').value.trim();
     const duration = Number(document.getElementById('newDurationInput').value) || 12;
+    const lang = document.getElementById('newLangInput').value;
     if(!pendingNewImage){ errBox.textContent = 'Сначала выберите картинку'; return; }
     if(!/^https?:\/\//i.test(link)){ errBox.textContent = 'Ссылка должна начинаться с http:// или https://'; return; }
-    banners.push({ id: uid(), image: pendingNewImage, link, duration, enabled: true });
+    banners.push({ id: uid(), image: pendingNewImage, link, duration, enabled: true, lang });
     pendingNewImage = null;
     document.getElementById('newImageInput').value = '';
     document.getElementById('newImagePreviewWrap').style.display = 'none';
     document.getElementById('newLinkInput').value = '';
+    document.getElementById('newLangInput').value = '';
     document.getElementById('newDurationInput').value = '12';
     document.getElementById('addBannerBtn').disabled = true;
     renderList();
