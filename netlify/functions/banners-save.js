@@ -56,6 +56,9 @@ exports.handler = async (event) => {
     if (b.image.length > 2_000_000) {
       return { statusCode: 400, body: JSON.stringify({ error: 'Одна из картинок слишком большая после сжатия — попробуйте выбрать файл поменьше' }) };
     }
+    if (b.lang !== undefined && b.lang !== '' && !['ru', 'uk', 'en'].includes(b.lang)) {
+      return { statusCode: 400, body: JSON.stringify({ error: 'Недопустимое значение языка баннера' }) };
+    }
   }
 
   const token = process.env.GITHUB_TOKEN;
