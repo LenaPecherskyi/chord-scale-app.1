@@ -62,6 +62,24 @@
     background:repeating-linear-gradient(0deg, rgba(120,220,255,0.018) 0px, rgba(120,220,255,0.018) 1px, transparent 1px, transparent 3px);
     mix-blend-mode:screen;
   }
+  /* Рекламный баннер (свои курсы/вебинары) — одна полоса на всю ширину, самая первая
+     на странице, видна одинаково на всех вкладках. Скрыта по умолчанию, появляется
+     только когда banners.json отдаёт хотя бы один включённый баннер (см. initPromoBanner). */
+  .promo-banner-strip{
+    position:relative; z-index:2;
+    width:100%;
+    overflow:hidden;
+    background:var(--bg2);
+    border-bottom:1px solid var(--border);
+  }
+  .promo-banner-strip a{ display:block; width:100%; line-height:0; }
+  .promo-banner-strip img{
+    display:block; width:100%; height:auto; max-height:200px; object-fit:cover;
+    transition:opacity 0.22s ease;
+  }
+  .promo-banner-strip.promo-fade img{ opacity:0; }
+  @media (max-width:520px){ .promo-banner-strip img{ max-height:120px; } }
+
   header{
     padding:18px 16px 10px;
     text-align:center;
@@ -1410,6 +1428,11 @@
 </style>
 </head>
 <body>
+<div class="promo-banner-strip" id="promoBannerStrip" style="display:none;">
+  <a id="promoBannerLink" href="#" target="_blank" rel="noopener sponsored">
+    <img id="promoBannerImg" alt="" src="">
+  </a>
+</div>
 <div class="ambient-glow"></div>
 <div class="scanlines"></div>
 <header>
@@ -5290,6 +5313,67 @@
     }
   }
 
+  /* ---------- РЕКЛАМНЫЙ БАННЕР (свои курсы/вебинары) ----------
+     Кликабельная картинка вверху страницы, общая для всех вкладок сразу (лежит вне
+     .container, в самом верху body). Список баннеров — в banners.json в корне сайта,
+     который редактируется через отдельную страницу admin-banners.html (без правок кода).
+     Если баннеров несколько — листаются по очереди, у каждого своя длительность показа.
+     Если файла нет / он пуст / запрос не удался — полоса остаётся скрытой, ничего не ломается. */
+  let promoBannerList = [];
+  let promoBannerIndex = 0;
+  let promoBannerTimer = null;
+
+  async function initPromoBanner(){
+    const strip = document.getElementById('promoBannerStrip');
+    if(!strip) return;
+    let data;
+    try {
+      const res = await fetch('/banners.json', { cache: 'no-store' });
+      if(!res.ok) return;
+      data = await res.json();
+    } catch(e){ return; }
+    const list = Array.isArray(data && data.banners)
+      ? data.banners.filter(b => b && b.enabled !== false && b.image && b.link)
+      : [];
+    if(!list.length) return;
+    promoBannerList = list;
+    promoBannerIndex = 0;
+    showPromoBannerAt(0);
+    strip.style.display = '';
+    if(list.length > 1) schedulePromoBannerRotation();
+  }
+
+  function showPromoBannerAt(idx){
+    const b = promoBannerList[idx];
+    if(!b) return;
+    const link = document.getElementById('promoBannerLink');
+    const img = document.getElementById('promoBannerImg');
+    if(!link || !img) return;
+    link.href = b.link;
+    img.src = b.image;
+    img.alt = b.alt || '';
+  }
+
+  function schedulePromoBannerRotation(){
+    clearTimeout(promoBannerTimer);
+    const current = promoBannerList[promoBannerIndex];
+    const seconds = Math.max(3, Number(current && current.duration) || 12);
+    promoBannerTimer = setTimeout(()=>{
+      promoBannerIndex = (promoBannerIndex + 1) % promoBannerList.length;
+      const strip = document.getElementById('promoBannerStrip');
+      if(strip){
+        strip.classList.add('promo-fade');
+        setTimeout(()=>{
+          showPromoBannerAt(promoBannerIndex);
+          strip.classList.remove('promo-fade');
+        }, 220);
+      } else {
+        showPromoBannerAt(promoBannerIndex);
+      }
+      schedulePromoBannerRotation();
+    }, seconds * 1000);
+  }
+
   function showProModal(title, text){
     document.getElementById('proModalTitle').textContent = title;
     document.getElementById('proModalText').textContent = text;
@@ -6208,6 +6292,8 @@
       });
     });
     applyI18nToDom();
+
+    initPromoBanner();
 
     render();
   }

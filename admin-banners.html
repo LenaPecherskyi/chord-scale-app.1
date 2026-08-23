@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Управление баннерами — Аккорды и Лады</title>
+<style>
+  :root{
+    --bg:#04070c; --panel:rgba(140,220,255,0.05); --panel2:rgba(10,22,34,0.7);
+    --border:rgba(140,220,255,0.14); --text:#dff2ff; --muted:#5f8ba3;
+    --accent:#35c5ff; --accent2:#6a5cff; --on-accent:#04121c; --bad:#ff6b6b; --good:#5fd08a;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; padding:24px 14px 60px; background:var(--bg); color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    min-height:100vh;
+  }
+  .wrap{ max-width:760px; margin:0 auto; }
+  h1{ font-size:1.3rem; margin:0 0 4px; }
+  .sub{ color:var(--muted); font-size:0.88rem; margin:0 0 22px; line-height:1.5; }
+  .card{
+    background:var(--panel2); border:1px solid var(--border); border-radius:16px;
+    padding:18px; margin-bottom:16px;
+  }
+  .card h2{ font-size:1rem; margin:0 0 12px; }
+  label{ display:block; font-size:0.8rem; color:var(--muted); margin:10px 0 4px; }
+  input[type=text], input[type=url], input[type=number], input[type=password]{
+    width:100%; padding:9px 11px; border-radius:9px; border:1px solid var(--border);
+    background:rgba(255,255,255,0.03); color:var(--text); font-size:0.92rem;
+  }
+  input[type=file]{ color:var(--text); font-size:0.85rem; }
+  .row{ display:flex; gap:10px; flex-wrap:wrap; }
+  .row > *{ flex:1 1 140px; }
+  button{
+    cursor:pointer; border:none; border-radius:10px; padding:10px 16px;
+    font-size:0.9rem; font-weight:600;
+  }
+  .btn-primary{ background:linear-gradient(135deg,var(--accent),var(--accent2)); color:var(--on-accent); }
+  .btn-secondary{ background:rgba(255,255,255,0.08); color:var(--text); }
+  .btn-danger{ background:rgba(255,80,80,0.15); color:var(--bad); }
+  .btn-small{ padding:6px 10px; font-size:0.78rem; }
+  button:disabled{ opacity:0.5; cursor:default; }
+  .status-msg{ margin-top:10px; font-size:0.85rem; min-height:1.2em; }
+  .status-msg.ok{ color:var(--good); }
+  .status-msg.err{ color:var(--bad); }
+  .banner-item{
+    display:flex; gap:12px; align-items:flex-start; border:1px solid var(--border);
+    border-radius:12px; padding:12px; margin-bottom:10px; background:rgba(255,255,255,0.02);
+  }
+  .banner-item img{
+    width:150px; max-width:40vw; height:auto; border-radius:8px; display:block; flex-shrink:0;
+    background:#111;
+  }
+  .banner-fields{ flex:1 1 auto; min-width:0; }
+  .banner-fields .row{ margin-top:6px; }
+  .banner-actions{ display:flex; gap:6px; margin-top:8px; flex-wrap:wrap; }
+  .checkbox-line{ display:flex; align-items:center; gap:8px; margin-top:8px; font-size:0.85rem; color:var(--muted); }
+  .checkbox-line input{ width:auto; }
+  .empty-note{ color:var(--muted); font-size:0.88rem; padding:8px 0; }
+  .hint{ color:var(--muted); font-size:0.78rem; margin-top:4px; line-height:1.4; }
+  .gate{ text-align:center; padding:40px 16px; }
+  .gate input{ max-width:260px; margin:0 auto 12px; }
+  a.site-link{ color:var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🖼️ Управление рекламными баннерами</h1>
+  <p class="sub">
+    Здесь можно загрузить кликабельные баннеры (картинка + ссылка) для своих курсов и вебинаров —
+    они появятся одной полосой вверху сайта <a class="site-link" href="/" target="_blank">app.andrewpechersky.online</a>,
+    видны на всех вкладках. Если баннеров несколько, они листаются по очереди — время показа каждого
+    настраивается отдельно. Изменения публикуются на сайте примерно за 15–30 секунд после сохранения.
+  </p>
+
+  <div id="gateCard" class="card gate">
+    <h2>Вход</h2>
+    <input type="password" id="passwordInput" placeholder="Пароль администратора">
+    <div><button class="btn-primary" id="unlockBtn">Войти</button></div>
+    <div class="status-msg err" id="gateError"></div>
+  </div>
+
+  <div id="editorArea" style="display:none;">
+    <div class="card">
+      <h2>Текущие баннеры</h2>
+      <div id="bannerList"></div>
+      <div class="empty-note" id="emptyNote" style="display:none;">Пока нет ни одного баннера — добавьте первый ниже.</div>
+    </div>
+
+    <div class="card">
+      <h2>Добавить новый баннер</h2>
+      <label>Картинка</label>
+      <input type="file" id="newImageInput" accept="image/*">
+      <div class="hint">Рекомендуем широкое соотношение сторон — например 1200×200 или 1200×300 (как баннер, а не квадрат). Картинка сожмётся автоматически.</div>
+      <div id="newImagePreviewWrap" style="display:none; margin-top:10px;">
+        <img id="newImagePreview" style="max-width:100%; max-height:140px; border-radius:8px;">
+        <div class="hint" id="newImageSizeNote"></div>
+      </div>
+      <label>Ссылка (куда вести при клике)</label>
+      <input type="url" id="newLinkInput" placeholder="https://...">
+      <label>Показывать N секунд (при нескольких баннерах)</label>
+      <input type="number" id="newDurationInput" value="12" min="3" max="120">
+      <div style="margin-top:14px;">
+        <button class="btn-primary" id="addBannerBtn" disabled>Добавить в список</button>
+      </div>
+      <div class="status-msg err" id="addError"></div>
+    </div>
+
+    <div class="card">
+      <button class="btn-primary" id="saveBtn">💾 Сохранить и опубликовать на сайте</button>
+      <div class="status-msg" id="saveStatus"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  let password = '';
+  let banners = []; // {id, image(base64 dataURL), link, duration, enabled}
+  let pendingNewImage = null;
+
+  function uid(){ return 'b' + Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
+
+  async function loadCurrentBanners(){
+    try {
+      const res = await fetch('/banners.json', { cache: 'no-store' });
+      if(res.ok){
+        const data = await res.json();
+        banners = Array.isArray(data.banners) ? data.banners.map(b => ({
+          id: b.id || uid(),
+          image: b.image,
+          link: b.link,
+          duration: Number(b.duration) || 12,
+          enabled: b.enabled !== false
+        })) : [];
+      }
+    } catch(e){ /* пусто по умолчанию */ }
+    renderList();
+  }
+
+  function renderList(){
+    const wrap = document.getElementById('bannerList');
+    const emptyNote = document.getElementById('emptyNote');
+    wrap.innerHTML = '';
+    if(!banners.length){ emptyNote.style.display = ''; return; }
+    emptyNote.style.display = 'none';
+    banners.forEach((b, idx) => {
+      const item = document.createElement('div');
+      item.className = 'banner-item';
+      item.innerHTML = `
+        <img src="${b.image}" alt="">
+        <div class="banner-fields">
+          <label>Ссылка</label>
+          <input type="url" data-field="link" value="${(b.link||'').replace(/"/g,'&quot;')}">
+          <div class="row">
+            <div>
+              <label>Секунд показа</label>
+              <input type="number" data-field="duration" value="${b.duration}" min="3" max="120">
+            </div>
+          </div>
+          <div class="checkbox-line">
+            <input type="checkbox" data-field="enabled" ${b.enabled ? 'checked' : ''}> Показывать на сайте
+          </div>
+          <div class="banner-actions">
+            <button class="btn-secondary btn-small" data-action="up">⬆ Выше</button>
+            <button class="btn-secondary btn-small" data-action="down">⬇ Ниже</button>
+            <button class="btn-danger btn-small" data-action="delete">Удалить</button>
+          </div>
+        </div>
+      `;
+      item.querySelector('[data-field="link"]').addEventListener('input', e => { banners[idx].link = e.target.value; });
+      item.querySelector('[data-field="duration"]').addEventListener('input', e => { banners[idx].duration = Number(e.target.value) || 12; });
+      item.querySelector('[data-field="enabled"]').addEventListener('change', e => { banners[idx].enabled = e.target.checked; });
+      item.querySelector('[data-action="up"]').addEventListener('click', () => { moveBanner(idx, -1); });
+      item.querySelector('[data-action="down"]').addEventListener('click', () => { moveBanner(idx, 1); });
+      item.querySelector('[data-action="delete"]').addEventListener('click', () => { banners.splice(idx,1); renderList(); });
+      wrap.appendChild(item);
+    });
+  }
+
+  function moveBanner(idx, dir){
+    const newIdx = idx + dir;
+    if(newIdx < 0 || newIdx >= banners.length) return;
+    const tmp = banners[idx];
+    banners[idx] = banners[newIdx];
+    banners[newIdx] = tmp;
+    renderList();
+  }
+
+  // Сжимает картинку через canvas: уменьшает ширину и подбирает качество JPEG,
+  // чтобы итоговый data URL не раздувал banners.json и укладывался в лимит функции.
+  function compressImage(file){
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onerror = () => reject(new Error('Не удалось прочитать файл'));
+      reader.onload = () => {
+        const img = new Image();
+        img.onerror = () => reject(new Error('Файл не похож на изображение'));
+        img.onload = () => {
+          const maxWidths = [1200, 900, 700];
+          const qualities = [0.85, 0.7, 0.55, 0.4];
+          let result = null;
+          for(const maxW of maxWidths){
+            const scale = Math.min(1, maxW / img.width);
+            const w = Math.max(1, Math.round(img.width * scale));
+            const h = Math.max(1, Math.round(img.height * scale));
+            const canvas = document.createElement('canvas');
+            canvas.width = w; canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0,0,w,h);
+            ctx.drawImage(img, 0, 0, w, h);
+            for(const q of qualities){
+              const dataUrl = canvas.toDataURL('image/jpeg', q);
+              if(dataUrl.length < 700_000){ result = dataUrl; break; }
+              result = dataUrl;
+            }
+            if(result && result.length < 700_000) break;
+          }
+          resolve(result);
+        };
+        img.src = reader.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  document.getElementById('newImageInput').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    const addBtn = document.getElementById('addBannerBtn');
+    const errBox = document.getElementById('addError');
+    errBox.textContent = '';
+    pendingNewImage = null;
+    addBtn.disabled = true;
+    if(!file) return;
+    try {
+      const dataUrl = await compressImage(file);
+      pendingNewImage = dataUrl;
+      document.getElementById('newImagePreviewWrap').style.display = '';
+      document.getElementById('newImagePreview').src = dataUrl;
+      const kb = Math.round(dataUrl.length * 0.75 / 1024);
+      document.getElementById('newImageSizeNote').textContent = `После сжатия: примерно ${kb} КБ`;
+      addBtn.disabled = false;
+    } catch(err){
+      errBox.textContent = 'Не удалось обработать картинку: ' + err.message;
+    }
+  });
+
+  document.getElementById('addBannerBtn').addEventListener('click', () => {
+    const errBox = document.getElementById('addError');
+    errBox.textContent = '';
+    const link = document.getElementById('newLinkInput').value.trim();
+    const duration = Number(document.getElementById('newDurationInput').value) || 12;
+    if(!pendingNewImage){ errBox.textContent = 'Сначала выберите картинку'; return; }
+    if(!/^https?:\/\//i.test(link)){ errBox.textContent = 'Ссылка должна начинаться с http:// или https://'; return; }
+    banners.push({ id: uid(), image: pendingNewImage, link, duration, enabled: true });
+    pendingNewImage = null;
+    document.getElementById('newImageInput').value = '';
+    document.getElementById('newImagePreviewWrap').style.display = 'none';
+    document.getElementById('newLinkInput').value = '';
+    document.getElementById('newDurationInput').value = '12';
+    document.getElementById('addBannerBtn').disabled = true;
+    renderList();
+  });
+
+  document.getElementById('saveBtn').addEventListener('click', async () => {
+    const statusBox = document.getElementById('saveStatus');
+    const saveBtn = document.getElementById('saveBtn');
+    statusBox.className = 'status-msg';
+    statusBox.textContent = 'Публикуем…';
+    saveBtn.disabled = true;
+    try {
+      const res = await fetch('/.netlify/functions/banners-save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password, banners })
+      });
+      const data = await res.json().catch(() => ({}));
+      if(!res.ok){ throw new Error(data.error || ('Ошибка ' + res.status)); }
+      statusBox.className = 'status-msg ok';
+      statusBox.textContent = `Опубликовано! Изменения (${data.count} баннер(ов)) появятся на сайте примерно через 15–30 секунд.`;
+    } catch(err){
+      statusBox.className = 'status-msg err';
+      statusBox.textContent = 'Не удалось сохранить: ' + err.message;
+    } finally {
+      saveBtn.disabled = false;
+    }
+  });
+
+  document.getElementById('unlockBtn').addEventListener('click', unlock);
+  document.getElementById('passwordInput').addEventListener('keydown', (e) => { if(e.key === 'Enter') unlock(); });
+
+  function unlock(){
+    const val = document.getElementById('passwordInput').value;
+    if(!val){ document.getElementById('gateError').textContent = 'Введите пароль'; return; }
+    password = val;
+    document.getElementById('gateCard').style.display = 'none';
+    document.getElementById('editorArea').style.display = '';
+    loadCurrentBanners();
+  }
+})();
+</script>
+</body>
+</html>
