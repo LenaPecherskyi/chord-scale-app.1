@@ -1,3 +1,18 @@
 {
-  "banners": []
+  "banners": [
+    {
+      "id": "test1",
+      "image": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAwIiBoZWlnaHQ9IjIwMCI+PHJlY3Qgd2lkdGg9IjEyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjMzVjNWZmIi8+PHRleHQgeD0iNjAwIiB5PSIxMTAiIGZvbnQtc2l6ZT0iNDgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwNDEyMWMiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIj7QotCV0KHQoiDQkdCQ0J3QndCV0KAgMSAoNCDRgdC10LopPC90ZXh0Pjwvc3ZnPg==",
+      "link": "https://example.com/course1",
+      "duration": 4,
+      "enabled": true
+    },
+    {
+      "id": "test2",
+      "image": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAwIiBoZWlnaHQ9IjIwMCI+PHJlY3Qgd2lkdGg9IjEyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjNmE1Y2ZmIi8+PHRleHQgeD0iNjAwIiB5PSIxMTAiIGZvbnQtc2l6ZT0iNDgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmYiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIj7QotCV0KHQoiDQkdCQ0J3QndCV0KAgMiAoNSDRgdC10LopPC90ZXh0Pjwvc3ZnPg==",
+      "link": "https://example.com/course2",
+      "duration": 5,
+      "enabled": true
+    }
+  ]
 }
