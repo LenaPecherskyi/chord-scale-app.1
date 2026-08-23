@@ -1491,11 +1491,13 @@
   <div class="card manual-card" id="typeCardChord">
     <h2 data-i18n="type.chordTitle">Тип аккорда</h2>
     <select id="chordTypeSelect"></select>
+    <div class="empty-hint" id="chordDailyHint" style="margin-top:8px; display:none;"></div>
   </div>
 
   <div class="card" id="typeCardScale" style="display:none;">
     <h2 data-i18n="type.scaleTitle">Тип лада / гаммы</h2>
     <select id="scaleTypeSelect"></select>
+    <div class="empty-hint" id="scaleDailyHint" style="margin-top:8px; display:none;"></div>
   </div>
 
   <div class="card" id="instrumentsCard">
@@ -1602,6 +1604,7 @@
     <div class="prog-section-row" id="progStyleRow"></div>
 
     <button class="play-btn prog-generate-btn" id="progGenerateBtn" data-i18n="prog.generate">🎲 Сгенерировать последовательность</button>
+    <div class="empty-hint" id="progDailyHint" style="margin-top:8px; display:none;"></div>
 
     <div class="prog-result-wrap" id="progResultWrap" style="display:none;">
       <div class="prog-key-line" id="progKeyLine"></div>
@@ -2511,6 +2514,18 @@
     "style.rnb": "R&B",
     "proModal.pdfTitle": "Экспорт в PDF — в полной версии",
     "proModal.pdfText": "Скачивание разбора аккорда, лада, прогрессии или квинтового круга в виде PDF входит в полную версию приложения.",
+    "dailyLimit.chordTitle": "Дневной лимит аккордов исчерпан",
+    "dailyLimit.chordText": "В бесплатной версии доступно {limit} разных аккордов в день. Уже открытые сегодня аккорды по-прежнему смотрятся бесплатно. Лимит обновится завтра, либо оформите PRO — и ограничений не будет.",
+    "dailyLimit.scaleTitle": "Дневной лимит ладов исчерпан",
+    "dailyLimit.scaleText": "В бесплатной версии доступен {limit} лад/гамма в день. Уже открытый сегодня лад по-прежнему смотрится бесплатно. Лимит обновится завтра, либо оформите PRO — и ограничений не будет.",
+    "dailyLimit.progressionTitle": "Дневной лимит генераций исчерпан",
+    "dailyLimit.progressionText": "В бесплатной версии доступна {limit} генерация прогрессии в день. Лимит обновится завтра, либо оформите PRO — и генерируйте сколько угодно.",
+    "dailyLimit.remainingChord": "Бесплатно сегодня: ещё {count} из {limit} аккордов",
+    "dailyLimit.remainingScale": "Бесплатно сегодня: ещё {count} из {limit} ладов",
+    "dailyLimit.remainingProg": "Бесплатно сегодня: ещё {count} из {limit} генераций",
+    "dailyLimit.usedUpChord": "Дневной лимит аккордов исчерпан — завтра снова {limit}, либо оформите PRO",
+    "dailyLimit.usedUpScale": "Дневной лимит ладов исчерпан — завтра снова {limit}, либо оформите PRO",
+    "dailyLimit.usedUpProg": "Дневной лимит генераций исчерпан — завтра снова {limit}, либо оформите PRO",
     "app.title": "🎵 Аккорды и Лады",
     "app.subtitle": "Выбери ноту и тип — получи состав, клавиатуру и звук",
     "header.downloadPdf": "Скачать PDF",
@@ -2713,6 +2728,18 @@
     "style.rnb": "R&B",
     "proModal.pdfTitle": "PDF export — in the full version",
     "proModal.pdfText": "Downloading a chord, scale, progression, or circle-of-fifths breakdown as a PDF is part of the full version of the app.",
+    "dailyLimit.chordTitle": "Daily chord limit reached",
+    "dailyLimit.chordText": "The free version includes {limit} different chords per day. Chords you already opened today can still be viewed for free. The limit resets tomorrow, or get PRO for unlimited access.",
+    "dailyLimit.scaleTitle": "Daily scale limit reached",
+    "dailyLimit.scaleText": "The free version includes {limit} scale/mode per day. The scale you already opened today can still be viewed for free. The limit resets tomorrow, or get PRO for unlimited access.",
+    "dailyLimit.progressionTitle": "Daily generation limit reached",
+    "dailyLimit.progressionText": "The free version includes {limit} progression generation per day. The limit resets tomorrow, or get PRO to generate as many as you like.",
+    "dailyLimit.remainingChord": "Free today: {count} of {limit} chords left",
+    "dailyLimit.remainingScale": "Free today: {count} of {limit} scales left",
+    "dailyLimit.remainingProg": "Free today: {count} of {limit} generations left",
+    "dailyLimit.usedUpChord": "Daily chord limit reached — {limit} more tomorrow, or get PRO",
+    "dailyLimit.usedUpScale": "Daily scale limit reached — {limit} more tomorrow, or get PRO",
+    "dailyLimit.usedUpProg": "Daily generation limit reached — {limit} more tomorrow, or get PRO",
     "app.title": "🎵 Chords and Modes",
     "app.subtitle": "Pick a note and a type — get the notes, keyboard, and sound",
     "header.downloadPdf": "Download PDF",
@@ -2915,6 +2942,18 @@
     "style.rnb": "R&B",
     "proModal.pdfTitle": "Експорт у PDF — в повній версії",
     "proModal.pdfText": "Завантаження розбору акорду, ладу, прогресії чи квінтового кола у вигляді PDF входить у повну версію застосунку.",
+    "dailyLimit.chordTitle": "Денний ліміт акордів вичерпано",
+    "dailyLimit.chordText": "У безкоштовній версії доступно {limit} різних акордів на день. Уже відкриті сьогодні акорди, як і раніше, переглядаються безкоштовно. Ліміт оновиться завтра, або оформіть PRO — і обмежень не буде.",
+    "dailyLimit.scaleTitle": "Денний ліміт ладів вичерпано",
+    "dailyLimit.scaleText": "У безкоштовній версії доступний {limit} лад/гама на день. Уже відкритий сьогодні лад, як і раніше, переглядається безкоштовно. Ліміт оновиться завтра, або оформіть PRO — і обмежень не буде.",
+    "dailyLimit.progressionTitle": "Денний ліміт генерацій вичерпано",
+    "dailyLimit.progressionText": "У безкоштовній версії доступна {limit} генерація прогресії на день. Ліміт оновиться завтра, або оформіть PRO — і генеруйте скільки завгодно.",
+    "dailyLimit.remainingChord": "Безкоштовно сьогодні: ще {count} з {limit} акордів",
+    "dailyLimit.remainingScale": "Безкоштовно сьогодні: ще {count} з {limit} ладів",
+    "dailyLimit.remainingProg": "Безкоштовно сьогодні: ще {count} з {limit} генерацій",
+    "dailyLimit.usedUpChord": "Денний ліміт акордів вичерпано — завтра знову {limit}, або оформіть PRO",
+    "dailyLimit.usedUpScale": "Денний ліміт ладів вичерпано — завтра знову {limit}, або оформіть PRO",
+    "dailyLimit.usedUpProg": "Денний ліміт генерацій вичерпано — завтра знову {limit}, або оформіть PRO",
     "app.title": "🎵 Акорди і Лади",
     "app.subtitle": "Обери ноту і тип — отримай склад, клавіатуру і звук",
     "header.downloadPdf": "Завантажити PDF",
@@ -3337,7 +3376,13 @@
       else if(inScale) fill = '#2d5f8f';
 
       const wedge = el('path', {d, fill, stroke:'#121218', 'stroke-width':2, class:'wedge'});
-      wedge.addEventListener('click', ()=>{ state.root = pc; render(); });
+      wedge.addEventListener('click', ()=>{
+        if(!checkScaleQuota(scaleKeyFor(pc, state.scaleType))){
+          showProModal(t('dailyLimit.scaleTitle'), t('dailyLimit.scaleText', {limit: DAILY_LIMITS.scale}));
+          return;
+        }
+        state.root = pc; render();
+      });
       svg.appendChild(wedge);
 
       const primaryText = chordInfo ? chordInfo.label : noteName(pc, pc);
@@ -3978,6 +4023,10 @@
       btn.textContent = r.label;
       btn.dataset.pc = r.pc;
       btn.addEventListener('click', ()=>{
+        if(!checkChordQuota(chordKeyFor(r.pc, state.chordType))){
+          showProModal(t('dailyLimit.chordTitle'), t('dailyLimit.chordText', {limit: DAILY_LIMITS.chord}));
+          return;
+        }
         state.root = r.pc;
         clearCustomChord();
         render();
@@ -3996,7 +4045,15 @@
       sel.appendChild(opt);
     });
     sel.value = state.chordType;
-    sel.addEventListener('change', ()=>{ state.chordType = sel.value; clearCustomChord(); render(); });
+    sel.addEventListener('change', ()=>{
+      const newType = sel.value;
+      if(!checkChordQuota(chordKeyFor(state.root, newType))){
+        sel.value = state.chordType;
+        showProModal(t('dailyLimit.chordTitle'), t('dailyLimit.chordText', {limit: DAILY_LIMITS.chord}));
+        return;
+      }
+      state.chordType = newType; clearCustomChord(); render();
+    });
   }
 
   function buildScaleSelect(){
@@ -4009,7 +4066,15 @@
       sel.appendChild(opt);
     });
     sel.value = state.scaleType;
-    sel.addEventListener('change', ()=>{ state.scaleType = sel.value; render(); });
+    sel.addEventListener('change', ()=>{
+      const newType = sel.value;
+      if(!checkScaleQuota(scaleKeyFor(state.root, newType))){
+        sel.value = state.scaleType;
+        showProModal(t('dailyLimit.scaleTitle'), t('dailyLimit.scaleText', {limit: DAILY_LIMITS.scale}));
+        return;
+      }
+      state.scaleType = newType; render();
+    });
   }
 
   /* ---------- РЕНДЕР: ТЕКСТ / ЧИПЫ ---------- */
@@ -4351,6 +4416,7 @@
     const input = document.getElementById('chordSearch');
     if(input) input.value = '';
     hideSearchMessages();
+    if(searchQuotaTimer){ clearTimeout(searchQuotaTimer); searchQuotaTimer = null; }
   }
 
   function hideSearchMessages(){
@@ -4359,9 +4425,14 @@
     document.getElementById('chordSearch').classList.remove('has-error');
   }
 
+  // Дневной лимит для поиска считаем не на каждое нажатие клавиши (иначе просто печатать
+  // название аккорда буквально сжигало бы лимит посимвольно), а когда пользователь на
+  // мгновение остановился печатать и результат распознался без ошибки.
+  let searchQuotaTimer = null;
   function handleChordSearchInput(){
     const input = document.getElementById('chordSearch');
     const raw = input.value;
+    if(searchQuotaTimer){ clearTimeout(searchQuotaTimer); searchQuotaTimer = null; }
     if(!raw.trim()){
       state.customChord = null;
       hideSearchMessages();
@@ -4390,6 +4461,21 @@
       warnBox.style.display = 'none';
     }
     render();
+    if(!state.isPro){
+      searchQuotaTimer = setTimeout(()=>{
+        searchQuotaTimer = null;
+        if(document.getElementById('chordSearch').value !== raw) return; // пользователь продолжил печатать
+        if(!state.customChord) return; // тем временем очистили/сломали поиск
+        const key = 'custom:' + raw.trim().toLowerCase();
+        if(!checkChordQuota(key)){
+          state.customChord = null;
+          input.value = '';
+          hideSearchMessages();
+          render();
+          showProModal(t('dailyLimit.chordTitle'), t('dailyLimit.chordText', {limit: DAILY_LIMITS.chord}));
+        }
+      }, 700);
+    }
   }
 
   // Подсвечивает активной ровно одну из кнопок верхней навигации.
@@ -4403,6 +4489,10 @@
   // Переключает приложение в режим "Лад/Гамма" на заданной тонике и ладе —
   // используется при клике на подходящий лад из списка "Подходящие лады для соло/импровизации".
   function switchToScale(root, scaleId){
+    if(!checkScaleQuota(scaleKeyFor(root, scaleId))){
+      showProModal(t('dailyLimit.scaleTitle'), t('dailyLimit.scaleText', {limit: DAILY_LIMITS.scale}));
+      return;
+    }
     state.view = 'notes';
     state.mode = 'scale';
     state.root = root;
@@ -5091,14 +5181,114 @@
   const progState = { length: 8, style: 'auto', lastCandidates: null, lastSeed: null };
 
   // --- Каркас платных функций (визуальный, без реальной обработки платежей) ---
-  // Бесплатно навсегда: разбор аккорда/лада, квинтовый круг, метроном, короткие и средние
-  // прогрессии в основных стилях. Платно (по итогам исследования фриминум-моделей): более
+  // Бесплатно навсегда: разбор аккорда/лада (в пределах дневного лимита, см. ДНЕВНЫЕ ЛИМИТЫ ниже),
+  // квинтовый круг, метроном, короткие и средние прогрессии в основных стилях (тоже в пределах
+  // дневного лимита генераций). Платно (по итогам исследования фриминум-моделей): более
   // продвинутые/нишевые стили генератора, удлинённая 12-тактовая форма и экспорт в PDF.
   const PRO_PROG_STYLES = ['bossa','boogie','neoclassical','funk','rnb'];
   const PRO_PROG_LENGTHS = [12];
 
   function isProStyleLocked(styleId){ return !state.isPro && PRO_PROG_STYLES.includes(styleId); }
   function isProLengthLocked(n){ return !state.isPro && PRO_PROG_LENGTHS.includes(n); }
+
+  /* ---------- ДНЕВНЫЕ БЕСПЛАТНЫЕ ЛИМИТЫ (freemium) ----------
+     Чтобы бесплатная версия давала попробовать функциональность, но мотивировала оформить PRO,
+     ограничиваем количество РАЗНЫХ аккордов / ладов и число генераций прогрессий в день.
+     Повторный просмотр уже открытого сегодня аккорда/лада всегда бесплатный — лимит расходуется
+     только на действительно новые комбинации. Лимит сбрасывается в начале нового календарного
+     дня по местному времени устройства. Хранится в localStorage — это ограничение per-браузер,
+     а не per-аккаунт (у приложения нет учётных записей). PRO (isPro=true, демо или настоящая
+     подписка) снимает все ограничения — см. проверку в начале каждой check*Quota-функции. */
+  const DAILY_LIMITS = { chord: 3, scale: 1, progression: 1 };
+  const DAILY_USAGE_KEY = 'chordsModesDailyUsage_v1';
+
+  function todayStr(){
+    const d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  }
+  function loadDailyUsage(){
+    let usage = null;
+    try { usage = JSON.parse(localStorage.getItem(DAILY_USAGE_KEY) || 'null'); } catch(e){ usage = null; }
+    const today = todayStr();
+    if(!usage || usage.date !== today) usage = { date: today, chords: [], scales: [], progressions: 0 };
+    if(!Array.isArray(usage.chords)) usage.chords = [];
+    if(!Array.isArray(usage.scales)) usage.scales = [];
+    if(typeof usage.progressions !== 'number') usage.progressions = 0;
+    return usage;
+  }
+  function saveDailyUsage(usage){
+    try { localStorage.setItem(DAILY_USAGE_KEY, JSON.stringify(usage)); } catch(e){}
+  }
+  function chordKeyFor(root, chordType){ return root + '|' + chordType; }
+  function scaleKeyFor(root, scaleType){ return root + '|' + scaleType; }
+  // Каждая check*Quota — «проверить и, если укладывается в лимит, сразу зарегистрировать».
+  // Уже встречавшийся сегодня ключ всегда пропускается (true) без повторного расхода лимита.
+  function checkChordQuota(key){
+    if(state.isPro) return true;
+    const usage = loadDailyUsage();
+    if(usage.chords.includes(key)) return true;
+    if(usage.chords.length >= DAILY_LIMITS.chord) return false;
+    usage.chords.push(key);
+    saveDailyUsage(usage);
+    return true;
+  }
+  function checkScaleQuota(key){
+    if(state.isPro) return true;
+    const usage = loadDailyUsage();
+    if(usage.scales.includes(key)) return true;
+    if(usage.scales.length >= DAILY_LIMITS.scale) return false;
+    usage.scales.push(key);
+    saveDailyUsage(usage);
+    return true;
+  }
+  // У прогрессий нет стабильного «ключа» (результат каждый раз случайный), поэтому просто
+  // считаем количество генераций/перегенераций за день — и «Другой вариант» тоже расходует лимит.
+  function checkProgressionQuota(){
+    if(state.isPro) return true;
+    const usage = loadDailyUsage();
+    if(usage.progressions >= DAILY_LIMITS.progression) return false;
+    usage.progressions += 1;
+    saveDailyUsage(usage);
+    return true;
+  }
+  // Обновляет ненавязчивую подсказку об остатке дневного лимита под селектором типа аккорда/лада
+  // и над кнопкой генератора прогрессий. У PRO-пользователей подсказка скрыта.
+  function renderDailyLimitHints(){
+    const usage = loadDailyUsage();
+    const chordHint = document.getElementById('chordDailyHint');
+    if(chordHint){
+      if(state.isPro){ chordHint.style.display = 'none'; }
+      else {
+        const left = Math.max(0, DAILY_LIMITS.chord - usage.chords.length);
+        chordHint.style.display = '';
+        chordHint.textContent = left > 0
+          ? t('dailyLimit.remainingChord', {count: left, limit: DAILY_LIMITS.chord})
+          : t('dailyLimit.usedUpChord', {limit: DAILY_LIMITS.chord});
+      }
+    }
+    const scaleHint = document.getElementById('scaleDailyHint');
+    if(scaleHint){
+      if(state.isPro){ scaleHint.style.display = 'none'; }
+      else {
+        const left = Math.max(0, DAILY_LIMITS.scale - usage.scales.length);
+        scaleHint.style.display = '';
+        scaleHint.textContent = left > 0
+          ? t('dailyLimit.remainingScale', {count: left, limit: DAILY_LIMITS.scale})
+          : t('dailyLimit.usedUpScale', {limit: DAILY_LIMITS.scale});
+      }
+    }
+    const progHint = document.getElementById('progDailyHint');
+    if(progHint){
+      if(state.isPro){ progHint.style.display = 'none'; }
+      else {
+        const left = Math.max(0, DAILY_LIMITS.progression - usage.progressions);
+        progHint.style.display = '';
+        progHint.textContent = left > 0
+          ? t('dailyLimit.remainingProg', {count: left, limit: DAILY_LIMITS.progression})
+          : t('dailyLimit.usedUpProg', {limit: DAILY_LIMITS.progression});
+      }
+    }
+  }
 
   function showProModal(title, text){
     document.getElementById('proModalTitle').textContent = title;
@@ -5402,6 +5592,10 @@
   }
 
   function switchToChord(rootPc, typeId){
+    if(!checkChordQuota(chordKeyFor(rootPc, typeId))){
+      showProModal(t('dailyLimit.chordTitle'), t('dailyLimit.chordText', {limit: DAILY_LIMITS.chord}));
+      return;
+    }
     state.view = 'notes';
     state.mode = 'chord';
     state.root = rootPc;
@@ -5446,9 +5640,14 @@
       chip.addEventListener('click', ()=> switchToChord(c.rootPc, c.type));
       row.appendChild(chip);
     });
+    renderDailyLimitHints();
   }
 
   function runProgressionGenerator(){
+    if(!checkProgressionQuota()){
+      showProModal(t('dailyLimit.progressionTitle'), t('dailyLimit.progressionText', {limit: DAILY_LIMITS.progression}));
+      return;
+    }
     const input = document.getElementById('progressionInput');
     const errBox = document.getElementById('progressionError');
     const { chords: seedChords, invalid } = parseProgressionSeedInput(input.value);
@@ -5498,6 +5697,10 @@
 
   function regenerateProgression(){
     if(!progState.lastSeed) return runProgressionGenerator();
+    if(!checkProgressionQuota()){
+      showProModal(t('dailyLimit.progressionTitle'), t('dailyLimit.progressionText', {limit: DAILY_LIMITS.progression}));
+      return;
+    }
     const targetLength = Math.max(progState.lastSeed.length, progState.length);
     let result;
     if(progState.lastCandidates && progState.lastCandidates.length){
@@ -5513,6 +5716,7 @@
   function renderProgressionsUI(){
     if(!document.getElementById('progLengthRow').children.length) buildProgLengthUI();
     if(!document.getElementById('progStyleRow').children.length) buildProgStyleUI();
+    renderDailyLimitHints();
   }
 
   /* ---------- ОБУЧЕНИЕ (видеоуроки + карточки курсов) ---------- */
@@ -5835,6 +6039,7 @@
     buildTheoryHTML();
     buildVoicingsHTML();
     if(state.mode === 'scale') renderCircleOfFifths();
+    renderDailyLimitHints();
   }
 
   /* ---------- ИНИЦИАЛИЗАЦИЯ ---------- */
